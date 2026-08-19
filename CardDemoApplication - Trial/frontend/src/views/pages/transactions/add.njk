@@ -1,0 +1,161 @@
+{% extends "layouts/base.njk" %}
+{% from "components/back-link/macro.njk"     import govukBackLink %}
+{% from "components/input/macro.njk"         import govukInput %}
+{% from "components/select/macro.njk"        import govukSelect %}
+{% from "components/button/macro.njk"        import govukButton %}
+{% from "components/date-input/macro.njk"    import govukDateInput %}
+{% from "components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block backLink %}
+  {{ govukBackLink({ text: "Back to transactions", href: "/transactions" }) }}
+{% endblock %}
+
+{% block content %}
+
+<span class="cd-page-caption">Transaction Management</span>
+<h1 class="govuk-heading-l">Add Transaction</h1>
+
+{% if errors %}
+  {{ govukErrorSummary({ titleText: "There is a problem", errorList: errors }) }}
+{% endif %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <form action="/transactions/add" method="post" novalidate>
+
+      <h2 class="govuk-heading-m govuk-!-margin-top-0">Account / Card</h2>
+      <div class="cd-form-grid">
+
+        {{ govukInput({
+          label: { text: "Account ID" },
+          hint: { text: "11-digit account number" },
+          id: "accountId",
+          name: "accountId",
+          classes: "govuk-input--width-20",
+          value: formData.accountId or "",
+          inputmode: "numeric",
+          attributes: { maxlength: "11", oninput: "this.value=this.value.replace(/[^0-9]/g,'')" }
+        }) }}
+
+        {{ govukInput({
+          label: { text: "Card Number" },
+          hint: { text: "16-digit card number" },
+          id: "cardNumber",
+          name: "cardNumber",
+          classes: "govuk-input--width-20",
+          value: formData.cardNumber or "",
+          inputmode: "numeric",
+          attributes: { maxlength: "16", oninput: "this.value=this.value.replace(/[^0-9]/g,'')" }
+        }) }}
+
+      </div>
+
+      <hr class="cd-section-divider">
+      <h2 class="govuk-heading-m">Transaction Details</h2>
+      <div class="cd-form-grid">
+
+        {% set typeItems = [{ value: "", text: "— Select —" }] %}
+        {% for type in types %}
+          {% set typeItems = typeItems.concat([{ value: type.typeCode, text: type.typeCode + " — " + type.description, selected: formData.transactionType == type.typeCode }]) %}
+        {% endfor %}
+        {{ govukSelect({
+          label: { text: "Transaction Type" },
+          id: "transactionType",
+          name: "transactionType",
+          value: formData.transactionType,
+          items: typeItems
+        }) }}
+
+        {{ govukInput({
+          label: { text: "Category" },
+          id: "categoryType",
+          name: "categoryType",
+          value: formData.categoryType or "",
+          attributes: { required: "" }
+        }) }}
+
+        {{ govukSelect({
+          label: { text: "Source" },
+          id: "source",
+          name: "source",
+          value: formData.source,
+          items: [
+            { value: "ONLINE",      text: "Online" },
+            { value: "SWIPE",       text: "Swipe" },
+            { value: "CONTACTLESS", text: "Contactless" },
+            { value: "ATM",         text: "ATM" },
+            { value: "MANUAL",      text: "Manual" },
+            { value: "SYSTEM",      text: "System" }
+          ]
+        }) }}
+
+        {{ govukInput({
+          label: { text: "Amount" },
+          id: "amount",
+          name: "amount",
+          classes: "govuk-input--width-10",
+          type: "number",
+          value: formData.amount or "",
+          prefix: { text: "£" },
+          attributes: { step: "0.01", min: "0.01", required: "" }
+        }) }}
+
+      </div>
+
+      {{ govukInput({
+        label: { text: "Description" },
+        id: "description",
+        name: "description",
+        value: formData.description or "",
+        attributes: { required: "", maxlength: "255" }
+      }) }}
+
+      <div class="cd-form-grid">
+
+        {{ govukDateInput({
+          id: "originalDate",
+          namePrefix: "originalDate",
+          fieldset: { legend: { text: "Original Date" } },
+          hint: { text: "For example, 27 3 2026" },
+          items: [
+            { name: "day",   id: "originalDate-day",   classes: "govuk-input--width-2", value: formData["originalDate-day"]   or "" },
+            { name: "month", id: "originalDate-month", classes: "govuk-input--width-2", value: formData["originalDate-month"] or "" },
+            { name: "year",  id: "originalDate-year",  classes: "govuk-input--width-4", value: formData["originalDate-year"]  or "" }
+          ]
+        }) }}
+
+        {{ govukDateInput({
+          id: "processDate",
+          namePrefix: "processDate",
+          fieldset: { legend: { text: "Process Date" } },
+          hint: { text: "For example, 27 3 2026" },
+          items: [
+            { name: "day",   id: "processDate-day",   classes: "govuk-input--width-2", value: formData["processDate-day"]   or "" },
+            { name: "month", id: "processDate-month", classes: "govuk-input--width-2", value: formData["processDate-month"] or "" },
+            { name: "year",  id: "processDate-year",  classes: "govuk-input--width-4", value: formData["processDate-year"]  or "" }
+          ]
+        }) }}
+
+      </div>
+
+      <hr class="cd-section-divider">
+      <h2 class="govuk-heading-m">Merchant Details <span class="govuk-body govuk-!-color-secondary">(optional)</span></h2>
+      <div class="cd-form-grid">
+
+        {{ govukInput({ label: { text: "Merchant Name" }, id: "merchantName", name: "merchantName", value: formData.merchantName or "" }) }}
+        {{ govukInput({ label: { text: "City" },          id: "merchantCity", name: "merchantCity", value: formData.merchantCity or "" }) }}
+        {{ govukInput({ label: { text: "Merchant ID" },   id: "merchantId",   name: "merchantId",   value: formData.merchantId   or "", classes: "govuk-input--width-10" }) }}
+        {{ govukInput({ label: { text: "ZIP" },           id: "merchantZip",  name: "merchantZip",  value: formData.merchantZip  or "", classes: "govuk-input--width-10" }) }}
+
+      </div>
+
+      <div class="cd-action-group">
+        {{ govukButton({ text: "Submit Transaction" }) }}
+        <a href="/transactions" class="govuk-link">Cancel</a>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+{% endblock %}

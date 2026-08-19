@@ -1,0 +1,66 @@
+{% extends "layouts/base.njk" %}
+{% from "components/button/macro.njk" import govukButton %}
+
+{% block content %}
+
+<span class="cd-page-caption">Card Services Portal</span>
+<h1 class="govuk-heading-l govuk-!-margin-bottom-1">Admin Menu</h1>
+<p class="govuk-body govuk-!-color-secondary">Welcome back, <strong>{{ user.displayName }}</strong>. You have administrator access.</p>
+
+<h2 class="govuk-heading-m govuk-!-margin-top-4">Administration</h2>
+<div class="cd-menu-grid">
+
+  <a href="/admin/users" class="cd-menu-card cd-menu-card--admin">
+    <span class="cd-menu-card__number">1</span>
+    <span class="cd-menu-card__title">User Administration</span>
+    <p class="cd-menu-card__desc">Create, update and delete user accounts</p>
+  </a>
+
+  <a href="/admin/transaction-types" class="cd-menu-card cd-menu-card--admin">
+    <span class="cd-menu-card__number">2</span>
+    <span class="cd-menu-card__title">Transaction Types</span>
+    <p class="cd-menu-card__desc">Maintain transaction type reference data</p>
+  </a>
+
+</div>
+
+<h2 class="govuk-heading-m">Account &amp; Card Services</h2>
+<div class="cd-menu-grid">
+
+  <a href="/accounts/inquiry" class="cd-menu-card">
+    <span class="cd-menu-card__number">3</span>
+    <span class="cd-menu-card__title">Account Inquiry</span>
+    <p class="cd-menu-card__desc">View account and customer details</p>
+  </a>
+
+  <a href="/cards/search" class="cd-menu-card">
+    <span class="cd-menu-card__number">4</span>
+    <span class="cd-menu-card__title">Card Search</span>
+    <p class="cd-menu-card__desc">Search and browse cards</p>
+  </a>
+
+  <a href="/transactions" class="cd-menu-card">
+    <span class="cd-menu-card__number">5</span>
+    <span class="cd-menu-card__title">Transactions</span>
+    <p class="cd-menu-card__desc">View and add transaction records</p>
+  </a>
+
+  <a href="/pending-authorizations" class="cd-menu-card">
+    <span class="cd-menu-card__number">6</span>
+    <span class="cd-menu-card__title">Pending Authorizations</span>
+    <p class="cd-menu-card__desc">Review pending auths and fraud flags</p>
+  </a>
+
+  <a href="/reports/requests" class="cd-menu-card">
+    <span class="cd-menu-card__number">7</span>
+    <span class="cd-menu-card__title">Report Request</span>
+    <p class="cd-menu-card__desc">Submit monthly, yearly or custom reports</p>
+  </a>
+
+</div>
+
+<form method="POST" action="/auth/logout">
+  {{ govukButton({ text: "Sign out", classes: "govuk-button--secondary" }) }}
+</form>
+
+{% endblock %}

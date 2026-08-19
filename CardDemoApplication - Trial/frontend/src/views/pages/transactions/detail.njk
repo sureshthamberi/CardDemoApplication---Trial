@@ -1,0 +1,88 @@
+{% extends "layouts/base.njk" %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
+{% from "components/button/macro.njk"    import govukButton %}
+
+{% block backLink %}
+  {{ govukBackLink({ text: "Back to transactions", href: "/transactions" }) }}
+{% endblock %}
+
+{% block content %}
+
+<span class="cd-page-caption">Transaction Management</span>
+<h1 class="govuk-heading-l">Transaction Detail</h1>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <div class="cd-summary-card">
+      <div class="cd-summary-card__title">Transaction Information</div>
+      <dl class="govuk-summary-list govuk-summary-list--no-border">
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Transaction ID</dt>
+          <dd class="govuk-summary-list__value cd-mono">{{ transaction.transactionId }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Card Number</dt>
+          <dd class="govuk-summary-list__value cd-mono">{{ transaction.cardNumberMasked }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Type</dt>
+          <dd class="govuk-summary-list__value">
+            <strong class="govuk-tag govuk-tag--{% if transaction.typeCode == 'PAYMENT' or transaction.typeCode == 'REFUND' %}green{% elif transaction.typeCode == 'PURCHASE' %}blue{% else %}grey{% endif %}">
+              {{ transaction.typeCode }}
+            </strong>
+          </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Category</dt>
+          <dd class="govuk-summary-list__value">{{ transaction.categoryCode }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Source</dt>
+          <dd class="govuk-summary-list__value">{{ transaction.source }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Amount</dt>
+          <dd class="govuk-summary-list__value cd-amount-positive">{{ transaction.amount | currency }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Description</dt>
+          <dd class="govuk-summary-list__value">{{ transaction.description }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Original Date</dt>
+          <dd class="govuk-summary-list__value">{{ transaction.originalTimestamp | formatDate }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Processed Date</dt>
+          <dd class="govuk-summary-list__value">{{ transaction.processedTimestamp | formatDate }}</dd>
+        </div>
+      </dl>
+    </div>
+
+    {% if transaction.merchantName %}
+    <div class="cd-summary-card">
+      <div class="cd-summary-card__title">Merchant Details</div>
+      <dl class="govuk-summary-list govuk-summary-list--no-border">
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Merchant</dt>
+          <dd class="govuk-summary-list__value">{{ transaction.merchantName }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">City / ZIP</dt>
+          <dd class="govuk-summary-list__value">{{ transaction.merchantCity }} {{ transaction.merchantZip }}</dd>
+        </div>
+        {% if transaction.merchantId %}
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Merchant ID</dt>
+          <dd class="govuk-summary-list__value cd-mono">{{ transaction.merchantId }}</dd>
+        </div>
+        {% endif %}
+      </dl>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+{% endblock %}

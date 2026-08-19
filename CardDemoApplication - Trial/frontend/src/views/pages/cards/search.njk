@@ -1,0 +1,88 @@
+{% extends "layouts/base.njk" %}
+{% from "components/back-link/macro.njk"     import govukBackLink %}
+{% from "components/input/macro.njk"         import govukInput %}
+{% from "components/button/macro.njk"        import govukButton %}
+{% from "components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block backLink %}
+  {{ govukBackLink({ text: "Back to menu", href: "/menu" }) }}
+{% endblock %}
+
+{% block content %}
+
+<span class="cd-page-caption">Card Management</span>
+<h1 class="govuk-heading-l">Card Search</h1>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <form action="/cards/search" method="get" novalidate>
+      <div class="cd-form-grid">
+
+        {{ govukInput({
+          label: { text: "Account ID" },
+          hint: { text: "Optional — 11 digits" },
+          id: "accountId",
+          name: "accountId",
+          classes: "govuk-input--width-20",
+          value: query.accountId or "",
+          inputmode: "numeric",
+          attributes: { maxlength: "11", oninput: "this.value=this.value.replace(/[^0-9]/g,'')" }
+        }) }}
+
+        {{ govukInput({
+          label: { text: "Card Number" },
+          hint: { text: "Optional — 16 digits" },
+          id: "cardNumber",
+          name: "cardNumber",
+          classes: "govuk-input--width-20",
+          value: query.cardNumber or "",
+          inputmode: "numeric",
+          attributes: { maxlength: "16", oninput: "this.value=this.value.replace(/[^0-9]/g,'')" }
+        }) }}
+
+      </div>
+      {{ govukButton({ text: "Search Cards", classes: "govuk-button--secondary" }) }}
+    </form>
+  </div>
+</div>
+
+{% if data and data.items.length %}
+<hr class="cd-section-divider">
+<div class="cd-table-wrapper">
+  <table class="govuk-table">
+    <thead class="govuk-table__head">
+      <tr class="govuk-table__row">
+        <th class="govuk-table__header">Account</th>
+        <th class="govuk-table__header">Card Number</th>
+        <th class="govuk-table__header">Card Name</th>
+        <th class="govuk-table__header">Expiry</th>
+        <th class="govuk-table__header">Status</th>
+        <th class="govuk-table__header">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+      {% for card in data.items %}
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell cd-mono">{{ card.accountId }}</td>
+        <td class="govuk-table__cell cd-mono">{{ card.cardNumberMasked }}</td>
+        <td class="govuk-table__cell">{{ card.cardName }}</td>
+        <td class="govuk-table__cell">{{ card.expiryMonth }}/{{ card.expiryYear }}</td>
+        <td class="govuk-table__cell">
+          <strong class="govuk-tag govuk-tag--{% if card.cardStatus == 'ACTIVE' %}green{% elif card.cardStatus == 'EXPIRED' %}red{% else %}grey{% endif %}">
+            {{ card.cardStatus }}
+          </strong>
+        </td>
+        <td class="govuk-table__cell cd-table-actions">
+          <a href="/cards/detail?cardNumber={{ card.cardNumber }}" class="govuk-link">Detail</a>
+          <a href="/cards/{{ card.cardNumber }}/edit" class="govuk-link">Update</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% elif data %}
+<div class="govuk-inset-text">No cards found for the given search criteria.</div>
+{% endif %}
+
+{% endblock %}

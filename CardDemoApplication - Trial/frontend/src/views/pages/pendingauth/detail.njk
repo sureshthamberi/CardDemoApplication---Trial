@@ -1,0 +1,101 @@
+{% extends "layouts/base.njk" %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
+{% from "components/button/macro.njk"    import govukButton %}
+
+{% block backLink %}
+  {{ govukBackLink({ text: "Back to search", href: "/pending-authorizations" }) }}
+{% endblock %}
+
+{% block content %}
+
+<span class="cd-page-caption">Authorization Management</span>
+<h1 class="govuk-heading-l">Authorization Detail</h1>
+
+{% if auth %}
+
+{% if auth.fraudFlag == 'Y' %}
+<div class="cd-fraud-marked">
+  <strong>⚑ This authorization is flagged as FRAUD</strong>
+</div>
+{% else %}
+<div class="cd-fraud-clear">
+  <strong>✓ This authorization is clear — no fraud flag</strong>
+</div>
+{% endif %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <div class="cd-summary-card">
+      <div class="cd-summary-card__title">Authorization Details</div>
+      <dl class="govuk-summary-list govuk-summary-list--no-border">
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Authorization ID</dt>
+          <dd class="govuk-summary-list__value cd-mono">{{ auth.authorizationId }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Account ID</dt>
+          <dd class="govuk-summary-list__value cd-mono">{{ auth.accountId }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Card</dt>
+          <dd class="govuk-summary-list__value cd-mono">{{ auth.cardNumberMasked }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Amount</dt>
+          <dd class="govuk-summary-list__value cd-amount-positive">{{ auth.amount | currency }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Merchant</dt>
+          <dd class="govuk-summary-list__value">{{ auth.merchantName }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Location</dt>
+          <dd class="govuk-summary-list__value">{{ auth.merchantCity }}{% if auth.merchantZip %} {{ auth.merchantZip }}{% endif %}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Merchant ID</dt>
+          <dd class="govuk-summary-list__value cd-mono">{{ auth.merchantId }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Status</dt>
+          <dd class="govuk-summary-list__value">
+            <strong class="govuk-tag govuk-tag--blue">{{ auth.status }}</strong>
+          </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Fraud Flag</dt>
+          <dd class="govuk-summary-list__value">
+            <strong class="govuk-tag govuk-tag--{% if auth.fraudFlag == 'Y' %}red{% else %}green{% endif %}">
+              {% if auth.fraudFlag == 'Y' %}FRAUD{% else %}CLEAR{% endif %}
+            </strong>
+          </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Request Time</dt>
+          <dd class="govuk-summary-list__value">{{ auth.requestTimestamp | formatDate }}</dd>
+        </div>
+      </dl>
+    </div>
+
+    <hr class="cd-section-divider">
+    <h2 class="govuk-heading-m">Fraud Actions</h2>
+
+    <div class="cd-action-group">
+      {% if auth.fraudFlag == 'N' %}
+      <form method="POST" action="/pending-authorizations/{{ auth.authorizationId }}/fraud/mark">
+        <input type="hidden" name="notes" value="Marked via UI">
+        {{ govukButton({ text: "Mark as Fraud", classes: "govuk-button--warning" }) }}
+      </form>
+      {% else %}
+      <form method="POST" action="/pending-authorizations/{{ auth.authorizationId }}/fraud/unmark">
+        <input type="hidden" name="notes" value="Unmarked via UI">
+        {{ govukButton({ text: "Remove Fraud Flag", classes: "govuk-button--secondary" }) }}
+      </form>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

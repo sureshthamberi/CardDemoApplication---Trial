@@ -1,0 +1,85 @@
+{% extends "layouts/base.njk" %}
+{% from "components/back-link/macro.njk"     import govukBackLink %}
+{% from "components/input/macro.njk"         import govukInput %}
+{% from "components/button/macro.njk"        import govukButton %}
+{% from "components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block backLink %}
+  {{ govukBackLink({ text: "Back to menu", href: "/menu" }) }}
+{% endblock %}
+
+{% block content %}
+
+<span class="cd-page-caption">Account Management</span>
+<h1 class="govuk-heading-l">Bill Payment</h1>
+
+{% if errors %}
+  {{ govukErrorSummary({ titleText: "There is a problem", errorList: errors }) }}
+{% endif %}
+
+{% if not preview %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <p class="govuk-body">Enter an account ID to check the balance and make a payment.</p>
+    <form action="/payments/bill/preview" method="post" novalidate>
+
+      {{ govukInput({
+        label: { text: "Account ID", classes: "govuk-label--s" },
+        hint: { text: "11-digit account number" },
+        id: "accountId",
+        name: "accountId",
+        classes: "govuk-input--width-20",
+        value: accountId or "",
+        inputmode: "numeric",
+        attributes: { pattern: "[1-9][0-9]{10}", maxlength: "11", oninput: "this.value=this.value.replace(/[^0-9]/g,'')", required: "" }
+      }) }}
+
+      {{ govukButton({ text: "Check Balance", classes: "govuk-button--secondary" }) }}
+
+    </form>
+  </div>
+</div>
+
+{% else %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <div class="cd-stat-grid">
+      <div class="cd-stat-box">
+        <span class="cd-stat-box__value">{{ preview.currentBalance | currency }}</span>
+        <span class="cd-stat-box__label">Current Balance</span>
+      </div>
+      <div class="cd-stat-box">
+        <span class="cd-stat-box__value">£0.00</span>
+        <span class="cd-stat-box__label">Balance After Payment</span>
+      </div>
+    </div>
+
+    <div class="govuk-inset-text">
+      <p class="govuk-body">Account <strong class="cd-mono">{{ preview.accountId }}</strong></p>
+      <p class="govuk-body govuk-!-margin-bottom-0">
+        Confirming will pay the full balance of <strong>{{ preview.currentBalance | currency }}</strong> and reduce your balance to <strong>£0.00</strong>.
+      </p>
+    </div>
+
+    <div class="govuk-warning-text">
+      <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+      <strong class="govuk-warning-text__text">
+        <span class="govuk-warning-text__assistive">Warning</span>
+        This action cannot be undone.
+      </strong>
+    </div>
+
+    <div class="cd-action-group">
+      <form action="/payments/bill/confirm" method="post">
+        <input type="hidden" name="accountId" value="{{ preview.accountId }}">
+        <input type="hidden" name="confirmation" value="Y">
+        {{ govukButton({ text: "Confirm Payment" }) }}
+      </form>
+      <a href="/payments/bill" class="govuk-link">Cancel</a>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

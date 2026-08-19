@@ -1,0 +1,81 @@
+{% extends "layouts/base.njk" %}
+{% from "components/input/macro.njk"         import govukInput %}
+{% from "components/button/macro.njk"        import govukButton %}
+{% from "components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block backLink %}{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-2">Sign in</h1>
+    <p class="govuk-body govuk-!-color-secondary govuk-!-margin-bottom-6">Card Services Portal</p>
+
+    {% if errors %}
+      {{ govukErrorSummary({
+        titleText: "There is a problem",
+        errorList: errors
+      }) }}
+    {% endif %}
+
+    <form action="/auth/login" method="post" novalidate>
+
+      {{ govukInput({
+        label: { text: "User ID", classes: "govuk-label--s" },
+        id: "userId",
+        name: "userId",
+        autocomplete: "username",
+        spellcheck: false,
+        value: userId or "",
+        errorMessage: errors | first if errors,
+        attributes: { required: "" }
+      }) }}
+
+      {{ govukInput({
+        label: { text: "Password", classes: "govuk-label--s" },
+        id: "password",
+        name: "password",
+        type: "password",
+        autocomplete: "current-password",
+        errorMessage: errors | first if errors,
+        attributes: { required: "" }
+      }) }}
+
+      {{ govukButton({ text: "Sign in" }) }}
+
+    </form>
+
+    <hr class="cd-section-divider">
+    <details class="govuk-details">
+      <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">Test credentials</span>
+      </summary>
+      <div class="govuk-details__text">
+        <table class="govuk-table govuk-!-font-size-16">
+          <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+              <th class="govuk-table__header">User ID</th>
+              <th class="govuk-table__header">Password</th>
+              <th class="govuk-table__header">Role</th>
+            </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell cd-mono">USR001</td>
+              <td class="govuk-table__cell cd-mono">Admin@123</td>
+              <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--blue">ADMIN</strong></td>
+            </tr>
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell cd-mono">USR002</td>
+              <td class="govuk-table__cell cd-mono">User@123</td>
+              <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--grey">STANDARD</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+  </div>
+</div>
+{% endblock %}

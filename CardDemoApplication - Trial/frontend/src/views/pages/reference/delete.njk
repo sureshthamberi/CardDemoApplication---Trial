@@ -1,0 +1,51 @@
+{% extends "layouts/base.njk" %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
+{% from "components/button/macro.njk"    import govukButton %}
+
+{% block backLink %}
+  {{ govukBackLink({ text: "Back to transaction types", href: "/admin/transaction-types" }) }}
+{% endblock %}
+
+{% block content %}
+
+<span class="cd-page-caption">Administration — Reference Data</span>
+<h1 class="govuk-heading-l">Delete Transaction Type</h1>
+
+<div class="cd-danger-zone">
+  <div class="govuk-warning-text govuk-!-margin-bottom-0">
+    <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+    <strong class="govuk-warning-text__text">
+      <span class="govuk-warning-text__assistive">Warning</span>
+      You are about to permanently delete this transaction type. This action cannot be undone.
+    </strong>
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <div class="cd-summary-card">
+      <div class="cd-summary-card__title">Type to be deleted</div>
+      <dl class="govuk-summary-list govuk-summary-list--no-border">
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Type Code</dt>
+          <dd class="govuk-summary-list__value">
+            <strong class="govuk-tag govuk-tag--blue">{{ type.typeCode }}</strong>
+          </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Description</dt>
+          <dd class="govuk-summary-list__value">{{ type.description }}</dd>
+        </div>
+      </dl>
+    </div>
+
+    <form action="/admin/transaction-types/{{ type.typeCode }}/delete" method="post">
+      <div class="cd-action-group">
+        {{ govukButton({ text: "Confirm Delete", classes: "govuk-button--warning" }) }}
+        <a href="/admin/transaction-types" class="govuk-link">Cancel — keep this type</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

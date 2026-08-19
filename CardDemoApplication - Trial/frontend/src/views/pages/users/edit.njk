@@ -1,0 +1,75 @@
+{% extends "layouts/base.njk" %}
+{% from "components/back-link/macro.njk"     import govukBackLink %}
+{% from "components/input/macro.njk"         import govukInput %}
+{% from "components/select/macro.njk"        import govukSelect %}
+{% from "components/button/macro.njk"        import govukButton %}
+{% from "components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block backLink %}
+  {{ govukBackLink({ text: "Back to user list", href: "/admin/users" }) }}
+{% endblock %}
+
+{% block content %}
+
+<span class="cd-page-caption">Administration</span>
+<h1 class="govuk-heading-l">Update User: <span class="cd-mono">{{ user.userId }}</span></h1>
+
+{% if errors %}
+  {{ govukErrorSummary({ titleText: "There is a problem", errorList: errors }) }}
+{% endif %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <form action="/admin/users/{{ user.userId }}/edit" method="post" novalidate>
+      <input type="hidden" name="rowVersion" value="{{ user.rowVersion }}">
+
+      <div class="cd-form-grid">
+
+        {{ govukInput({
+          label: { text: "First Name", classes: "govuk-label--s" },
+          id: "firstName",
+          name: "firstName",
+          value: user.firstName,
+          attributes: { required: "" }
+        }) }}
+
+        {{ govukInput({
+          label: { text: "Last Name", classes: "govuk-label--s" },
+          id: "lastName",
+          name: "lastName",
+          value: user.lastName,
+          attributes: { required: "" }
+        }) }}
+
+        {{ govukSelect({
+          label: { text: "User Type", classes: "govuk-label--s" },
+          id: "userType",
+          name: "userType",
+          value: user.userType,
+          items: [
+            { value: "STANDARD", text: "Standard" },
+            { value: "ADMIN",    text: "Admin" }
+          ]
+        }) }}
+
+      </div>
+
+      {{ govukInput({
+        label: { text: "New Password", classes: "govuk-label--s" },
+        hint: { text: "Leave blank to keep the existing password — minimum 6 characters if changing" },
+        id: "password",
+        name: "password",
+        type: "password",
+        classes: "govuk-input--width-20",
+        attributes: { autocomplete: "new-password", minlength: "6" }
+      }) }}
+
+      <div class="cd-action-group">
+        {{ govukButton({ text: "Update User" }) }}
+        <a href="/admin/users" class="govuk-link">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

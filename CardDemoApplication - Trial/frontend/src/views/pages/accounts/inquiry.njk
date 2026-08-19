@@ -1,0 +1,138 @@
+{% extends "layouts/base.njk" %}
+{% from "components/back-link/macro.njk"     import govukBackLink %}
+{% from "components/input/macro.njk"         import govukInput %}
+{% from "components/button/macro.njk"        import govukButton %}
+{% from "components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block backLink %}
+  {{ govukBackLink({ text: "Back to menu", href: "/menu" }) }}
+{% endblock %}
+
+{% block content %}
+
+<span class="cd-page-caption">Account Management</span>
+<h1 class="govuk-heading-l">Account Inquiry</h1>
+
+{% if errors %}
+  {{ govukErrorSummary({
+    titleText: "There is a problem",
+    errorList: errors
+  }) }}
+{% endif %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <form action="/accounts/inquiry" method="post" novalidate>
+
+      {{ govukInput({
+        label: { text: "Account ID", classes: "govuk-label--s" },
+        hint: { text: "Enter the 11-digit account number" },
+        id: "accountId",
+        name: "accountId",
+        classes: "govuk-input--width-20",
+        value: accountId or "",
+        inputmode: "numeric",
+        attributes: {
+          pattern: "[1-9][0-9]{10}",
+          maxlength: "11",
+          oninput: "this.value=this.value.replace(/[^0-9]/g,'')",
+          required: ""
+        },
+        errorMessage: { text: errors[0].text } if errors
+      }) }}
+
+      {{ govukButton({ text: "Enquire" }) }}
+
+    </form>
+  </div>
+</div>
+
+{% if account %}
+<hr class="cd-section-divider">
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-one-half">
+    <div class="cd-summary-card">
+      <div class="cd-summary-card__title">Account Details</div>
+      <dl class="govuk-summary-list govuk-summary-list--no-border">
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Account ID</dt>
+          <dd class="govuk-summary-list__value cd-mono">{{ account.account.accountId }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Status</dt>
+          <dd class="govuk-summary-list__value">
+            <strong class="govuk-tag govuk-tag--{% if account.account.accountStatus == 'ACTIVE' %}green{% elif account.account.accountStatus == 'SUSPENDED' %}orange{% else %}red{% endif %}">
+              {{ account.account.accountStatus }}
+            </strong>
+          </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Current Balance</dt>
+          <dd class="govuk-summary-list__value cd-amount-positive">{{ account.account.currentBalance | currency }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Credit Limit</dt>
+          <dd class="govuk-summary-list__value">{{ account.account.creditLimit | currency }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Cash Limit</dt>
+          <dd class="govuk-summary-list__value">{{ account.account.cashCreditLimit | currency }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Expiry Date</dt>
+          <dd class="govuk-summary-list__value">{{ account.account.expirationDate | formatDate }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Group</dt>
+          <dd class="govuk-summary-list__value">{{ account.account.groupId }}</dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <div class="govuk-grid-column-one-half">
+    <div class="cd-summary-card">
+      <div class="cd-summary-card__title">Customer Details</div>
+      <dl class="govuk-summary-list govuk-summary-list--no-border">
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Name</dt>
+          <dd class="govuk-summary-list__value">{{ account.customer.firstName }} {{ account.customer.lastName }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">SSN</dt>
+          <dd class="govuk-summary-list__value cd-mono">{{ account.customer.ssnMasked }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Credit Score</dt>
+          <dd class="govuk-summary-list__value">{{ account.customer.creditScore }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Address</dt>
+          <dd class="govuk-summary-list__value">
+            {{ account.customer.addressLine1 }}{% if account.customer.addressLine2 %}, {{ account.customer.addressLine2 }}{% endif %}<br>
+            {{ account.customer.city }}, {{ account.customer.state }} {{ account.customer.zip }}
+          </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Phone</dt>
+          <dd class="govuk-summary-list__value">{{ account.customer.phone1 }}{% if account.customer.phone2 %} / {{ account.customer.phone2 }}{% endif %}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Gov. ID</dt>
+          <dd class="govuk-summary-list__value cd-mono">{{ account.customer.governmentIdMasked }}</dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</div>
+
+<div class="cd-action-group">
+  {{ govukButton({ text: "Update Account", href: "/accounts/update?accountId=" + account.account.accountId, classes: "govuk-button--secondary" }) }}
+  {{ govukButton({ text: "Pay Bill",        href: "/payments/bill?accountId=" + account.account.accountId, classes: "govuk-button--secondary" }) }}
+  {{ govukButton({ text: "View Cards",      href: "/cards/search?accountId=" + account.account.accountId, classes: "govuk-button--secondary" }) }}
+  {{ govukButton({ text: "View Transactions", href: "/transactions?accountId=" + account.account.accountId, classes: "govuk-button--secondary" }) }}
+</div>
+{% endif %}
+
+{% endblock %}

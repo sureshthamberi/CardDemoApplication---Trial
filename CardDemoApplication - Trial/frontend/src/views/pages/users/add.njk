@@ -1,0 +1,82 @@
+{% extends "layouts/base.njk" %}
+{% from "components/back-link/macro.njk"     import govukBackLink %}
+{% from "components/input/macro.njk"         import govukInput %}
+{% from "components/select/macro.njk"        import govukSelect %}
+{% from "components/button/macro.njk"        import govukButton %}
+{% from "components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block backLink %}
+  {{ govukBackLink({ text: "Back to user list", href: "/admin/users" }) }}
+{% endblock %}
+
+{% block content %}
+
+<span class="cd-page-caption">Administration</span>
+<h1 class="govuk-heading-l">Add User</h1>
+
+{% if errors %}
+  {{ govukErrorSummary({ titleText: "There is a problem", errorList: errors }) }}
+{% endif %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <form action="/admin/users/add" method="post" novalidate>
+      <div class="cd-form-grid">
+
+        {{ govukInput({
+          label: { text: "User ID", classes: "govuk-label--s" },
+          id: "userId",
+          name: "userId",
+          value: formData.userId or "",
+          attributes: { required: "", autocomplete: "off", spellcheck: "false" }
+        }) }}
+
+        {{ govukSelect({
+          label: { text: "User Type", classes: "govuk-label--s" },
+          id: "userType",
+          name: "userType",
+          value: formData.userType,
+          items: [
+            { value: "",         text: "— Select —" },
+            { value: "STANDARD", text: "Standard" },
+            { value: "ADMIN",    text: "Admin" }
+          ]
+        }) }}
+
+        {{ govukInput({
+          label: { text: "First Name", classes: "govuk-label--s" },
+          id: "firstName",
+          name: "firstName",
+          value: formData.firstName or "",
+          attributes: { required: "" }
+        }) }}
+
+        {{ govukInput({
+          label: { text: "Last Name", classes: "govuk-label--s" },
+          id: "lastName",
+          name: "lastName",
+          value: formData.lastName or "",
+          attributes: { required: "" }
+        }) }}
+
+      </div>
+
+      {{ govukInput({
+        label: { text: "Password", classes: "govuk-label--s" },
+        hint: { text: "Minimum 6 characters" },
+        id: "password",
+        name: "password",
+        type: "password",
+        classes: "govuk-input--width-20",
+        attributes: { autocomplete: "new-password", required: "", minlength: "6" }
+      }) }}
+
+      <div class="cd-action-group">
+        {{ govukButton({ text: "Create User" }) }}
+        <a href="/admin/users" class="govuk-link">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

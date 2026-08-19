@@ -1,0 +1,10 @@
+C:\Workspace\CardDemoApplication - Trial\backend\src\test\java\com\carddemo\account\service\AccountServiceTest.java
+C:\Workspace\CardDemoApplication - Trial\backend\src\test\java\com\carddemo\auth\controller\AuthControllerIntegrationTest.java
+C:\Workspace\CardDemoApplication - Trial\backend\src\test\java\com\carddemo\auth\service\AuthServiceTest.java
+C:\Workspace\CardDemoApplication - Trial\backend\src\test\java\com\carddemo\card\service\CardServiceTest.java
+C:\Workspace\CardDemoApplication - Trial\backend\src\test\java\com\carddemo\fraud\service\FraudServiceTest.java
+C:\Workspace\CardDemoApplication - Trial\backend\src\test\java\com\carddemo\payment\service\PaymentServiceTest.java
+C:\Workspace\CardDemoApplication - Trial\backend\src\test\java\com\carddemo\pendingauth\service\PendingAuthServiceTest.java
+C:\Workspace\CardDemoApplication - Trial\backend\src\test\java\com\carddemo\report\service\ReportRequestServiceTest.java
+C:\Workspace\CardDemoApplication - Trial\backend\src\test\java\com\carddemo\transaction\service\TransactionServiceTest.java
+C:\Workspace\CardDemoApplication - Trial\backend\src\test\java\com\carddemo\user\service\UserAdminServiceTest.java

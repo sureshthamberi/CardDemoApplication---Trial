@@ -1,0 +1,79 @@
+{% extends "layouts/base.njk" %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
+{% block backLink %}
+  {{ govukBackLink({ text: "New search", href: "/pending-authorizations" }) }}
+{% endblock %}
+{% block content %}
+
+<span class="cd-page-caption">Authorization Management</span>
+<h1 class="govuk-heading-l">Pending Authorizations</h1>
+
+{% if data %}
+
+<div class="cd-stat-grid govuk-!-margin-bottom-4">
+  <div class="cd-stat-box">
+    <span class="cd-stat-box__value">{{ data.pendingAuthorizationSummary.count }}</span>
+    <span class="cd-stat-box__label">Pending Count</span>
+  </div>
+  <div class="cd-stat-box">
+    <span class="cd-stat-box__value">{{ data.pendingAuthorizationSummary.totalAmount | currency }}</span>
+    <span class="cd-stat-box__label">Total Amount</span>
+  </div>
+  <div class="cd-stat-box">
+    <span class="cd-stat-box__value">
+      <strong class="govuk-tag govuk-tag--{% if data.accountSummary.accountStatus == 'ACTIVE' %}green{% elif data.accountSummary.accountStatus == 'SUSPENDED' %}orange{% else %}grey{% endif %}">
+        {{ data.accountSummary.accountStatus }}
+      </strong>
+    </span>
+    <span class="cd-stat-box__label">Account Status</span>
+  </div>
+  {% if data.customerSummary %}
+  <div class="cd-stat-box">
+    <span class="cd-stat-box__value" style="font-size:16px;">{{ data.customerSummary.firstName }} {{ data.customerSummary.lastName }}</span>
+    <span class="cd-stat-box__label">Customer</span>
+  </div>
+  {% endif %}
+</div>
+
+{% if data.items.length %}
+<div class="cd-table-wrapper">
+  <table class="govuk-table">
+    <thead class="govuk-table__head">
+      <tr class="govuk-table__row">
+        <th class="govuk-table__header">Auth ID</th>
+        <th class="govuk-table__header">Merchant</th>
+        <th class="govuk-table__header govuk-table__header--numeric">Amount</th>
+        <th class="govuk-table__header">Status</th>
+        <th class="govuk-table__header">Fraud</th>
+        <th class="govuk-table__header">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+      {% for item in data.items %}
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell cd-mono">{{ item.authorizationId }}</td>
+        <td class="govuk-table__cell">{{ item.merchantName }}</td>
+        <td class="govuk-table__cell govuk-table__cell--numeric">{{ item.amount | currency }}</td>
+        <td class="govuk-table__cell">
+          <strong class="govuk-tag govuk-tag--blue">{{ item.status }}</strong>
+        </td>
+        <td class="govuk-table__cell">
+          <strong class="govuk-tag govuk-tag--{% if item.fraudFlag == 'Y' %}red{% else %}green{% endif %}">
+            {% if item.fraudFlag == 'Y' %}FRAUD{% else %}CLEAR{% endif %}
+          </strong>
+        </td>
+        <td class="govuk-table__cell cd-table-actions">
+          <a href="/pending-authorizations/{{ item.authorizationId }}" class="govuk-link">Detail</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="govuk-inset-text">No pending authorizations found for this account.</div>
+{% endif %}
+
+{% endif %}
+
+{% endblock %}
