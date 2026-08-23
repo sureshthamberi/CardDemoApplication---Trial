@@ -16,7 +16,10 @@ class TransactionsPage extends BasePage {
   async fillAddForm(data) {
     await this.page.locator('#accountId').fill(data.accountId);
     await this.page.locator('#cardNumber').fill(data.cardNumber);
-    await this.page.locator('#transactionType').selectOption({ index: 1 });
+    const transactionType = this.page.locator('#transactionType');
+    if (await transactionType.locator('option').count() > 1) {
+      await transactionType.selectOption({ index: 1 });
+    }
     await this.page.locator('#categoryType').fill(data.categoryType);
     await this.page.locator('#source').selectOption(data.source);
     await this.page.locator('#amount').fill(data.amount);

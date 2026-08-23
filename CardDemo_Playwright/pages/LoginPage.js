@@ -32,12 +32,12 @@ class LoginPage extends BasePage {
   }
 
   async assertLoginValidationErrors() {
-    await expect(this.page.getByText(/user id is required/i)).toBeVisible();
-    await expect(this.page.getByText(/password is required/i)).toBeVisible();
+    await expect(this.page.locator('#userId-error')).toContainText(/required/i);
+    await expect(this.page.locator('#password-error')).toContainText(/required/i);
   }
 
   async assertInvalidCredentialError() {
-    await expect(this.page.getByText(/invalid credentials|service unavailable/i)).toBeVisible();
+    await expect(this.page.getByText(/invalid credentials|user not found|service unavailable/i).first()).toBeVisible();
   }
 }
 

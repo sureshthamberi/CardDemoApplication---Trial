@@ -23,7 +23,7 @@ class UsersPage extends BasePage {
 
   async openEdit(userId) {
     await this.goto(`/admin/users/${userId}/edit`);
-    await expect(this.page.getByText(/update user/i)).toBeVisible();
+    await expect(this.page.getByRole('heading', { name: /update user/i })).toBeVisible();
   }
 
   async editUser(user) {

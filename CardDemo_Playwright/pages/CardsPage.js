@@ -34,11 +34,11 @@ class CardsPage extends BasePage {
   }
 
   async assertCardDetailVisible() {
-    await expect(this.page.getByText(/card detail/i)).toBeVisible();
+    await expect(this.page.getByRole('heading', { name: 'Card Detail' })).toBeVisible();
   }
 
   async assertCardNotFound() {
-    await expect(this.page.getByText(/card not found|problem/i)).toBeVisible();
+    await expect(this.page.getByText('Card not found', { exact: true })).toBeVisible();
   }
 
   async openEdit(cardNumber) {

@@ -13,7 +13,7 @@ test.describe('Negative - Access control', () => {
     await login.loginAsStandard(data.users.standard);
 
     await page.goto('/admin/users');
-    await expect(page.getByText(/access denied|do not have permission/i)).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Access denied' })).toBeVisible();
   });
 
   test('standard user cannot access reference data page', async ({ page }) => {
@@ -21,6 +21,6 @@ test.describe('Negative - Access control', () => {
     await login.loginAsStandard(data.users.standard);
 
     await page.goto('/admin/transaction-types');
-    await expect(page.getByText(/access denied|do not have permission/i)).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Access denied' })).toBeVisible();
   });
 });

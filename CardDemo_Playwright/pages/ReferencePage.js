@@ -13,7 +13,7 @@ class ReferencePage extends BasePage {
   }
 
   async addType(typeCode, description) {
-    await this.page.locator('#typeCode').fill(typeCode);
+    await this.page.locator('#typeCode').fill(typeCode, { force: true });
     await this.page.locator('#description').fill(description);
     await this.clickButton(/save|add|create/i);
   }

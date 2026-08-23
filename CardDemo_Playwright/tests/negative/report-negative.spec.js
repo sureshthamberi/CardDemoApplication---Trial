@@ -20,7 +20,7 @@ test.describe('Negative - Report validation', () => {
     const reports = new ReportsPage(page);
     await reports.open();
     await page.getByLabel(/custom date range/i).check();
-    await page.getByLabel(/^yes, submit this report$/i).check();
+    await page.getByRole('radio', { name: /^yes, submit this report$/i }).check();
     await reports.clickButton(/submit request/i);
     await reports.assertValidationErrors();
   });

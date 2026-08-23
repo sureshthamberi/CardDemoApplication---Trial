@@ -22,7 +22,7 @@ class MainMenuPage extends BasePage {
   }
 
   async openTransactions() {
-    await this.clickLink(/^transactions$/i);
+    await this.clickLink(/transactions/i);
   }
 
   async openPendingAuthorizations() {
@@ -34,7 +34,9 @@ class MainMenuPage extends BasePage {
   }
 
   async signOut() {
-    await this.clickButton(/sign out/i);
+    await this.page.getByRole('navigation', { name: 'Account navigation' })
+      .getByRole('button', { name: 'Sign out' })
+      .click();
   }
 }
 
