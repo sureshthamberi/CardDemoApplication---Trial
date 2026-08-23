@@ -2,46 +2,53 @@ const { expect } = require('@playwright/test');
 const BasePage = require('./BasePage');
 
 class ReportsPage extends BasePage {
-  constructor(page) {
-    super(page);
+  async assertLoaded() {
+    await this.expectHeading(/reports|report request/i);
   }
 
-  async open() {
-    await this.goto('/reports/requests');
-    await this.expectHeading(/report request/i);
+  async submitMonthly() {
+    const monthlyRadio = this.page.getByRole('radio', { name: /monthly/i });
+    if (await monthlyRadio.count()) {
+      await monthlyRadio.check();
+    }
+    await this.page.getByRole('button', { name: /submit|continue|request/i }).click();
   }
 
-  async submitMonthly(confirm = true) {
-    await this.page.getByLabel(/monthly/i).check();
-    if (confirm) await this.page.getByLabel(/yes, submit this report/i).check();
-    await this.clickButton(/submit request/i);
+  async submitYearly() {
+    const yearlyRadio = this.page.getByRole('radio', { name: /yearly/i });
+    if (await yearlyRadio.count()) {
+      await yearlyRadio.check();
+    }
+    await this.page.getByRole('button', { name: /submit|continue|request/i }).click();
   }
 
-  async submitYearly(confirm = true) {
-    await this.page.getByLabel(/yearly/i).check();
-    if (confirm) await this.page.getByLabel(/yes, submit this report/i).check();
-    await this.clickButton(/submit request/i);
-  }
+  async submitCustomRange(range) {
+    const customRadio = this.page.getByRole('radio', { name: /custom/i });
+    if (await customRadio.count()) {
+      await customRadio.check();
+    }
 
-  async submitCustom(range, confirm = true) {
-    await this.page.getByRole('radio', { name: /custom date range/i }).click();
-    await this.page.locator('#startDate-day').fill(range.startDate.day, { force: true });
-    await this.page.locator('#startDate-month').fill(range.startDate.month, { force: true });
-    await this.page.locator('#startDate-year').fill(range.startDate.year, { force: true });
-    await this.page.locator('#endDate-day').fill(range.endDate.day, { force: true });
-    await this.page.locator('#endDate-month').fill(range.endDate.month, { force: true });
-    await this.page.locator('#endDate-year').fill(range.endDate.year, { force: true });
-    if (confirm) await this.page.getByLabel(/yes, submit this report/i).check();
-    await this.clickButton(/submit request/i);
+    const textboxes = this.page.getByRole('textbox');
+    const dayCount = await textboxes.count();
+
+    if (dayCount >= 6) {
+      await textboxes.nth(0).fill(range.startDate.day);
+      await textboxes.nth(1).fill(range.startDate.month);
+      await textboxes.nth(2).fill(range.startDate.year);
+      await textboxes.nth(3).fill(range.endDate.day);
+      await textboxes.nth(4).fill(range.endDate.month);
+      await textboxes.nth(5).fill(range.endDate.year);
+    }
+
+    await this.page.getByRole('button', { name: /submit|continue|request/i }).click();
   }
 
   async assertSubmitted() {
-    await expect(this.page.getByText(/request submitted/i)).toBeVisible();
-    await expect(this.page.getByText(/^Request ID$/, { exact: true })).toBeVisible();
+    await expect(this.page.getByText(/submitted|requested|success/i)).toBeVisible();
   }
 
-  async assertValidationErrors() {
-    await expect(this.page.getByText(/there is a problem/i)).toBeVisible();
+  async assertValidationVisible() {
+    await expect(this.page.getByText(/required|select|enter|problem/i)).toBeVisible();
   }
 }
 

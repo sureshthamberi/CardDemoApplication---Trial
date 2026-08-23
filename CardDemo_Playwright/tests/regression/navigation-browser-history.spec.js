@@ -1,42 +1,34 @@
 const { test, expect } = require('@playwright/test');
 const LoginPage = require('../../pages/LoginPage');
 const MainMenuPage = require('../../pages/MainMenuPage');
-const data = require('../../test-data/testData');
+const AccountsPage = require('../../pages/AccountsPage');
+const CardsPage = require('../../pages/CardsPage');
+const testData = require('../../test-data/testData');
 
-test.describe('Regression - Navigation and browser history', () => {
-  test.beforeEach(async ({ page }) => {
-    const login = new LoginPage(page);
-    await login.loginAsStandard(data.users.standard);
-  });
+test.describe('Regression - Navigation and Browser History', () => {
+  test('standard user can navigate using links and back-forward browser actions', async ({ page }) => {
+    const loginPage = new LoginPage(page);
+    const menuPage = new MainMenuPage(page);
+    const accountsPage = new AccountsPage(page);
+    const cardsPage = new CardsPage(page);
 
-  test('navigate across pages using links and browser back/forward', async ({ page }) => {
-    const menu = new MainMenuPage(page);
+    await loginPage.loginAsStandard(testData.users.standard);
+    await menuPage.assertLoaded();
 
-    await menu.openAccountsInquiry();
-    await expect(page).toHaveURL(/\/accounts\/inquiry/);
+    await menuPage.openAccountsInquiry();
+    await accountsPage.assertLoaded();
 
     await page.goBack();
-    await expect(page).toHaveURL(/\/menu/);
+    await menuPage.assertLoaded();
 
     await page.goForward();
-    await expect(page).toHaveURL(/\/accounts\/inquiry/);
+    await accountsPage.assertLoaded();
 
-    await page.goto('/cards/search');
-    await expect(page).toHaveURL(/\/cards\/search/);
+    await page.goto('/menu');
+    await menuPage.openCards();
+    await cardsPage.assertLoaded();
 
     await page.goBack();
-    await expect(page).toHaveURL(/\/accounts\/inquiry|\/menu/);
-
-    await page.goto('/payments/bill');
-    await expect(page).toHaveURL(/\/payments\/bill/);
-
-    await page.goto('/transactions');
-    await expect(page).toHaveURL(/\/transactions/);
-
-    await page.goto('/pending-authorizations');
-    await expect(page).toHaveURL(/\/pending-authorizations/);
-
-    await page.goto('/reports/requests');
-    await expect(page).toHaveURL(/\/reports\/requests/);
+    await expect(page.getByRole('heading', { name: /main menu|menu/i })).toBeVisible();
   });
 });

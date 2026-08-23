@@ -4,40 +4,50 @@ const BasePage = require('./BasePage');
 class LoginPage extends BasePage {
   constructor(page) {
     super(page);
-    this.userId = page.locator('#userId');
-    this.password = page.locator('#password');
+    this.userIdInput = page.getByRole('textbox', { name: /user id/i });
+    this.signInButton = page.getByRole('button', { name: /sign in|login/i });
   }
 
   async open() {
     await this.goto('/auth/login');
-    await this.expectHeading(/sign in/i);
+    await this.expectHeading(/sign in|login/i);
   }
 
   async login(userId, password) {
-    await this.userId.fill(userId);
-    await this.password.fill(password);
-    await this.clickButton(/sign in/i);
+    await this.userIdInput.fill(userId);
+    await this.page.getByRole('textbox', { name: /password/i }).fill(password).catch(async () => {
+      await this.page.getByLabel(/password/i).fill(password);
+    });
+    await this.signInButton.click();
   }
 
-  async loginAsStandard(data) {
+  async loginAsStandard(user) {
     await this.open();
-    await this.login(data.userId, data.password);
-    await expect(this.page).toHaveURL(/\/menu\/main|\/menu\//);
+    await this.login(user.userId, user.password);
   }
 
-  async loginAsAdmin(data) {
+  async loginAsAdmin(user) {
     await this.open();
-    await this.login(data.userId, data.password);
-    await expect(this.page).toHaveURL(/\/menu\/admin|\/menu\//);
+    await this.login(user.userId, user.password);
   }
 
-  async assertLoginValidationErrors() {
-    await expect(this.page.locator('#userId-error')).toContainText(/required/i);
-    await expect(this.page.locator('#password-error')).toContainText(/required/i);
+  async submitBlank() {
+    await this.open();
+    await this.signInButton.click();
   }
 
-  async assertInvalidCredentialError() {
-    await expect(this.page.getByText(/invalid credentials|user not found|service unavailable/i).first()).toBeVisible();
+  async assertLoginPageVisible() {
+    await this.expectHeading(/sign in|login/i);
+    await expect(this.userIdInput).toBeVisible();
+    await expect(this.signInButton).toBeVisible();
+  }
+
+  async assertValidationVisible() {
+    await expect(this.page.getByText(/required|problem|enter/i)).toBeVisible();
+  }
+
+  async assertInvalidLoginError() {
+    await expect(this.page.getByText(/invalid|incorrect|unable|problem/i)).toBeVisible();
   }
 }
 

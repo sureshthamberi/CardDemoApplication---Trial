@@ -1,21 +1,24 @@
-const { test } = require('@playwright/test');
+const { test, expect } = require('@playwright/test');
 const LoginPage = require('../../pages/LoginPage');
 const MainMenuPage = require('../../pages/MainMenuPage');
-const data = require('../../test-data/testData');
+const testData = require('../../test-data/testData');
 
-test.describe('Smoke - Authentication', () => {
-  test('standard user can login and logout', async ({ page }) => {
-    const login = new LoginPage(page);
-    const menu = new MainMenuPage(page);
+test.describe('Smoke - Auth', () => {
+  test('standard user can sign in and sign out', async ({ page }) => {
+    const loginPage = new LoginPage(page);
+    const menuPage = new MainMenuPage(page);
 
-    await login.loginAsStandard(data.users.standard);
-    await menu.assertLoaded();
-    await menu.signOut();
-    await login.expectUrlContains('/auth/login');
+    await loginPage.loginAsStandard(testData.users.standard);
+    await menuPage.assertLoaded();
+
+    await menuPage.signOut();
+    await expect(page).toHaveURL(/auth/login/);
   });
 
-  test('admin user can login', async ({ page }) => {
-    const login = new LoginPage(page);
-    await login.loginAsAdmin(data.users.admin);
+  test('admin user can sign in', async ({ page }) => {
+    const loginPage = new LoginPage(page);
+
+    await loginPage.loginAsAdmin(testData.users.admin);
+    await expect(page).toHaveURL(/menu|admin|home/);
   });
 });

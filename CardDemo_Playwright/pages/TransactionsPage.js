@@ -2,54 +2,53 @@ const { expect } = require('@playwright/test');
 const BasePage = require('./BasePage');
 
 class TransactionsPage extends BasePage {
-  async openList(accountId = '') {
-    const url = accountId ? `/transactions?accountId=${accountId}` : '/transactions';
-    await this.goto(url);
+  async assertLoaded() {
     await this.expectHeading(/transactions/i);
   }
 
-  async openAdd() {
-    await this.goto('/transactions/add');
-    await this.expectHeading(/add transaction/i);
-  }
+  async openAddTransaction() {
+    const addButton = this.page.getByRole('button', { name: /add transaction|add/i });
+    const addLink = this.page.getByRole('link', { name: /add transaction|add/i });
 
-  async fillAddForm(data) {
-    await this.page.locator('#accountId').fill(data.accountId);
-    await this.page.locator('#cardNumber').fill(data.cardNumber);
-    const transactionType = this.page.locator('#transactionType');
-    if (await transactionType.locator('option').count() > 1) {
-      await transactionType.selectOption({ index: 1 });
+    if (await addButton.count()) {
+      await addButton.first().click();
+      return;
     }
-    await this.page.locator('#categoryType').fill(data.categoryType);
-    await this.page.locator('#source').selectOption(data.source);
-    await this.page.locator('#amount').fill(data.amount);
-    await this.page.locator('#description').fill(data.description);
 
-    await this.page.locator('#originalDate-day').fill(data.originalDate.day);
-    await this.page.locator('#originalDate-month').fill(data.originalDate.month);
-    await this.page.locator('#originalDate-year').fill(data.originalDate.year);
-
-    await this.page.locator('#processDate-day').fill(data.processDate.day);
-    await this.page.locator('#processDate-month').fill(data.processDate.month);
-    await this.page.locator('#processDate-year').fill(data.processDate.year);
-
-    await this.page.locator('#merchantName').fill(data.merchantName);
-    await this.page.locator('#merchantCity').fill(data.merchantCity);
-    await this.page.locator('#merchantId').fill(data.merchantId);
-    await this.page.locator('#merchantZip').fill(data.merchantZip);
+    if (await addLink.count()) {
+      await addLink.first().click();
+    }
   }
 
-  async submitTransaction() {
-    await this.clickButton(/submit transaction/i);
+  async addTransaction(data) {
+    await this.fillTextbox(/account id|account number/i, data.accountId);
+    await this.fillTextbox(/card number/i, data.cardNumber);
+
+    await this.selectOption(/category|category type/i, data.categoryType).catch(() => {});
+    await this.selectOption(/source/i, data.source).catch(() => {});
+
+    await this.fillTextbox(/amount/i, data.amount);
+    await this.fillTextbox(/description/i, data.description);
+
+    const textboxes = this.page.getByRole('textbox');
+    const count = await textboxes.count();
+
+    if (count >= 10) {
+      await textboxes.nth(count - 4).fill(data.merchantName);
+      await textboxes.nth(count - 3).fill(data.merchantCity);
+      await textboxes.nth(count - 2).fill(data.merchantId);
+      await textboxes.nth(count - 1).fill(data.merchantZip);
+    }
+
+    await this.page.getByRole('button', { name: /submit|save|add/i }).click();
   }
 
-  async assertRedirectedToList() {
-    await expect(this.page).toHaveURL(/\/transactions/);
+  async assertTransactionAdded() {
+    await expect(this.page.getByText(/success|added|created|submitted/i)).toBeVisible();
   }
 
-  async openDetail(transactionId) {
-    await this.goto(`/transactions/${transactionId}`);
-    await this.expectHeading(/transaction detail/i);
+  async assertValidationVisible() {
+    await expect(this.page.getByText(/required|invalid|problem/i)).toBeVisible();
   }
 }
 

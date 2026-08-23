@@ -9,32 +9,44 @@ class BasePage {
     await this.page.goto(path);
   }
 
-  async expectHeading(text) {
-    await expect(this.page.getByRole('heading', { name: text })).toBeVisible();
+  async expectHeading(namePattern) {
+    await expect(this.page.getByRole('heading', { name: namePattern })).toBeVisible();
   }
 
-  async clickLink(name) {
-    await this.page.getByRole('link', { name }).click();
+  async clickLink(namePattern) {
+    await this.page.getByRole('link', { name: namePattern }).click();
   }
 
-  async clickButton(name) {
-    await this.page.getByRole('button', { name }).click();
+  async clickButton(namePattern) {
+    await this.page.getByRole('button', { name: namePattern }).click();
   }
 
-  async expectText(text) {
-    await expect(this.page.getByText(text, { exact: false })).toBeVisible();
+  async fillTextbox(labelPattern, value) {
+    await this.page.getByRole('textbox', { name: labelPattern }).fill(value);
   }
 
-  async expectUrlContains(text) {
-    await expect(this.page).toHaveURL(new RegExp(text));
+  async selectOption(labelPattern, value) {
+    await this.page.getByRole('combobox', { name: labelPattern }).selectOption({ label: value }).catch(async () => {
+      await this.page.getByRole('combobox', { name: labelPattern }).selectOption(value);
+    });
   }
 
-  async goBack() {
-    await this.page.goBack();
+  async expectTextVisible(textPattern) {
+    await expect(this.page.getByText(textPattern)).toBeVisible();
   }
 
-  async goForward() {
-    await this.page.goForward();
+  async signOutIfVisible() {
+    const signOutButton = this.page.getByRole('button', { name: /sign out/i });
+    const signOutLink = this.page.getByRole('link', { name: /sign out/i });
+
+    if (await signOutButton.count()) {
+      await signOutButton.first().click();
+      return;
+    }
+
+    if (await signOutLink.count()) {
+      await signOutLink.first().click();
+    }
   }
 }
 

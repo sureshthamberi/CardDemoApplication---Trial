@@ -2,46 +2,39 @@ const { expect } = require('@playwright/test');
 const BasePage = require('./BasePage');
 
 class PendingAuthPage extends BasePage {
-  constructor(page) {
-    super(page);
-    this.accountId = page.locator('#accountId');
+  async assertLoaded() {
+    await this.expectHeading(/pending auth|pending authorizations/i);
   }
 
-  async openSearch() {
-    await this.goto('/pending-authorizations');
-    await this.expectHeading(/pending authorizations/i);
-  }
+  async openDetail(authId) {
+    const authSearch = this.page.getByRole('textbox', { name: /authorization id|auth id/i });
+    if (await authSearch.count()) {
+      await authSearch.fill(authId);
+      await this.page.getByRole('button', { name: /search|submit|continue/i }).click();
+      return;
+    }
 
-  async search(accountId) {
-    await this.accountId.fill(accountId);
-    await this.clickButton(/^search$/i);
-  }
-
-  async assertSearchPageError() {
-    await expect(this.page.getByText(/search failed|problem/i)).toBeVisible();
-  }
-
-  async openDetail(authorizationId) {
-    await this.goto(`/pending-authorizations/${authorizationId}`);
-    await this.expectHeading(/authorization detail/i);
-  }
-
-  async assertDetailVisible() {
-    await expect(this.page.getByText(/authorization details/i)).toBeVisible();
-    await expect(this.page.getByText(/fraud actions/i)).toBeVisible();
-  }
-
-  async markFraudIfAvailable() {
-    const markButton = this.page.getByRole('button', { name: /mark as fraud/i });
-    if (await markButton.count()) {
-      await markButton.click();
+    const authLink = this.page.getByRole('link', { name: new RegExp(authId, 'i') });
+    if (await authLink.count()) {
+      await authLink.first().click();
     }
   }
 
-  async unmarkFraudIfAvailable() {
-    const unmarkButton = this.page.getByRole('button', { name: /remove fraud flag/i });
+  async assertDetailVisible() {
+    await expect(this.page.getByText(/authorization|merchant|amount|status/i)).toBeVisible();
+  }
+
+  async markFraudIfVisible() {
+    const markButton = this.page.getByRole('button', { name: /mark fraud|fraud/i });
+    if (await markButton.count()) {
+      await markButton.first().click();
+    }
+  }
+
+  async unmarkFraudIfVisible() {
+    const unmarkButton = this.page.getByRole('button', { name: /unmark fraud|remove fraud/i });
     if (await unmarkButton.count()) {
-      await unmarkButton.click();
+      await unmarkButton.first().click();
     }
   }
 }

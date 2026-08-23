@@ -1,18 +1,17 @@
 const { test } = require('@playwright/test');
 const LoginPage = require('../../pages/LoginPage');
 const MainMenuPage = require('../../pages/MainMenuPage');
-const ReportsPage = require('../../pages/ReportsPage');
+const { expectCommonAccessibility } = require('../../utils/a11y');
 const testData = require('../../test-data/testData');
 
-test.describe('Negative - Reports', () => {
-  test('report request validates blank submit', async ({ page }) => {
+test.describe('Accessibility - Reports', () => {
+  test('reports page has accessible radio options and submit action', async ({ page }) => {
     const loginPage = new LoginPage(page);
     const menuPage = new MainMenuPage(page);
-    const reportsPage = new ReportsPage(page);
 
     await loginPage.loginAsStandard(testData.users.standard);
     await menuPage.openReports();
-    await page.getByRole('button', { name: /submit|continue|request/i }).click();
-    await reportsPage.assertValidationVisible();
+
+    await expectCommonAccessibility(page, /reports|report request/i);
   });
 });

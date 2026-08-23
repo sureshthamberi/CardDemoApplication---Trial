@@ -2,26 +2,21 @@ const { test } = require('@playwright/test');
 const LoginPage = require('../../pages/LoginPage');
 const MainMenuPage = require('../../pages/MainMenuPage');
 const AccountsPage = require('../../pages/AccountsPage');
-const TransactionsPage = require('../../pages/TransactionsPage');
 const testData = require('../../test-data/testData');
 
-test.describe('Smoke - Standard User', () => {
-  test('standard user can access key standard pages', async ({ page }) => {
+test.describe('Negative - Accounts', () => {
+  test('account inquiry validates blank and invalid input', async ({ page }) => {
     const loginPage = new LoginPage(page);
     const menuPage = new MainMenuPage(page);
     const accountsPage = new AccountsPage(page);
-    const transactionsPage = new TransactionsPage(page);
 
     await loginPage.loginAsStandard(testData.users.standard);
-    await menuPage.assertLoaded();
-
     await menuPage.openAccountsInquiry();
-    await accountsPage.assertLoaded();
 
-    await page.goBack();
-    await menuPage.assertLoaded();
+    await page.getByRole('button', { name: /search|submit|continue/i }).click();
+    await accountsPage.assertInvalidSearchHandled();
 
-    await menuPage.openTransactions();
-    await transactionsPage.assertLoaded();
+    await accountsPage.searchAccount(testData.accounts.invalidAccountId);
+    await accountsPage.assertInvalidSearchHandled();
   });
 });

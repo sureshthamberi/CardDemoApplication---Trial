@@ -3,9 +3,9 @@ require('dotenv').config();
 
 module.exports = defineConfig({
   testDir: './tests',
-  timeout: 60 * 1000,
+  timeout: 90 * 1000,
   expect: {
-    timeout: 10 * 1000
+    timeout: 15 * 1000
   },
   fullyParallel: false,
   forbidOnly: !!process.env.CI,

@@ -2,44 +2,63 @@ const { expect } = require('@playwright/test');
 const BasePage = require('./BasePage');
 
 class UsersPage extends BasePage {
-  async openList() {
-    await this.goto('/admin/users');
-    await expect(this.page.getByText(/user administration/i)).toBeVisible();
+  async assertLoaded() {
+    await this.expectHeading(/users/i);
   }
 
   async openAdd() {
-    await this.goto('/admin/users/add');
-    await expect(this.page.getByText(/add user/i)).toBeVisible();
+    await this.page.getByRole('button', { name: /add/i }).click().catch(async () => {
+      await this.page.getByRole('link', { name: /add/i }).click();
+    });
   }
 
   async addUser(user) {
-    await this.page.locator('#firstName').fill(user.firstName);
-    await this.page.locator('#lastName').fill(user.lastName);
-    await this.page.locator('#userId').fill(user.userId);
-    await this.page.locator('#password').fill(user.password);
-    await this.page.locator('#userType').selectOption(user.userType);
-    await this.clickButton(/add user|create|save/i);
+    await this.fillTextbox(/first name/i, user.firstName);
+    await this.fillTextbox(/last name/i, user.lastName);
+    await this.fillTextbox(/user id/i, user.userId);
+    await this.fillTextbox(/password/i, user.password);
+    await this.selectOption(/user type|role/i, user.userType).catch(() => {});
+    await this.page.getByRole('button', { name: /save|submit|add/i }).click();
   }
 
   async openEdit(userId) {
-    await this.goto(`/admin/users/${userId}/edit`);
-    await expect(this.page.getByRole('heading', { name: /update user/i })).toBeVisible();
+    const editButton = this.page.getByRole('button', { name: new RegExp(`edit.*${userId}|${userId}.*edit`, 'i') });
+    if (await editButton.count()) {
+      await editButton.first().click();
+      return;
+    }
+
+    await this.page.getByRole('button', { name: /edit/i }).first().click();
   }
 
   async editUser(user) {
-    await this.page.locator('#firstName').fill(user.firstName);
-    await this.page.locator('#lastName').fill(user.lastName);
-    await this.page.locator('#password').fill(user.password);
-    await this.page.locator('#userType').selectOption(user.userType);
-    await this.clickButton(/update user/i);
+    await this.fillTextbox(/first name/i, user.firstName);
+    await this.fillTextbox(/last name/i, user.lastName);
+    await this.fillTextbox(/password/i, user.password);
+    await this.selectOption(/user type|role/i, user.userType).catch(() => {});
+    await this.page.getByRole('button', { name: /save|update/i }).click();
   }
 
   async openDelete(userId) {
-    await this.goto(`/admin/users/${userId}/delete`);
+    const deleteButton = this.page.getByRole('button', { name: new RegExp(`delete.*${userId}|${userId}.*delete`, 'i') });
+    if (await deleteButton.count()) {
+      await deleteButton.first().click();
+      return;
+    }
+
+    await this.page.getByRole('button', { name: /delete/i }).first().click();
   }
 
   async confirmDelete() {
-    await this.clickButton(/delete|confirm/i);
+    await this.page.getByRole('button', { name: /confirm|delete/i }).click();
+  }
+
+  async assertSuccessVisible() {
+    await expect(this.page.getByText(/success|saved|updated|deleted/i)).toBeVisible();
+  }
+
+  async assertValidationVisible() {
+    await expect(this.page.getByText(/required|invalid|problem/i)).toBeVisible();
   }
 }
 

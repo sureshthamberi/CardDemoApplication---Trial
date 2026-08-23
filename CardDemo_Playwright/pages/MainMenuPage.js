@@ -1,42 +1,37 @@
+const { expect } = require('@playwright/test');
 const BasePage = require('./BasePage');
 
 class MainMenuPage extends BasePage {
   async assertLoaded() {
-    await this.expectHeading(/main menu/i);
+    await expect(this.page.getByRole('heading', { name: /main menu|menu/i })).toBeVisible();
   }
 
   async openAccountsInquiry() {
-    await this.clickLink(/account inquiry/i);
+    await this.page.getByRole('link', { name: /accounts|account inquiry/i }).click();
   }
 
-  async openAccountUpdate() {
-    await this.clickLink(/account update/i);
+  async openCards() {
+    await this.page.getByRole('link', { name: /cards|card/i }).click();
   }
 
-  async openBillPayment() {
-    await this.clickLink(/bill payment/i);
-  }
-
-  async openCardSearch() {
-    await this.clickLink(/card search/i);
-  }
-
-  async openTransactions() {
-    await this.clickLink(/transactions/i);
+  async openPayments() {
+    await this.page.getByRole('link', { name: /payments|bill payment/i }).click();
   }
 
   async openPendingAuthorizations() {
-    await this.clickLink(/pending authorizations/i);
+    await this.page.getByRole('link', { name: /pending auth|pending authorizations/i }).click();
   }
 
-  async openReportRequest() {
-    await this.clickLink(/report request/i);
+  async openReports() {
+    await this.page.getByRole('link', { name: /reports|report request/i }).click();
+  }
+
+  async openTransactions() {
+    await this.page.getByRole('link', { name: /transactions/i }).click();
   }
 
   async signOut() {
-    await this.page.getByRole('navigation', { name: 'Account navigation' })
-      .getByRole('button', { name: 'Sign out' })
-      .click();
+    await this.signOutIfVisible();
   }
 }
 

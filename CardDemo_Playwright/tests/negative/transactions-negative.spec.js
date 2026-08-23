@@ -1,27 +1,20 @@
 const { test } = require('@playwright/test');
 const LoginPage = require('../../pages/LoginPage');
 const MainMenuPage = require('../../pages/MainMenuPage');
-const AccountsPage = require('../../pages/AccountsPage');
 const TransactionsPage = require('../../pages/TransactionsPage');
 const testData = require('../../test-data/testData');
 
-test.describe('Smoke - Standard User', () => {
-  test('standard user can access key standard pages', async ({ page }) => {
+test.describe('Negative - Transactions', () => {
+  test('transaction creation validates blank mandatory fields', async ({ page }) => {
     const loginPage = new LoginPage(page);
     const menuPage = new MainMenuPage(page);
-    const accountsPage = new AccountsPage(page);
     const transactionsPage = new TransactionsPage(page);
 
     await loginPage.loginAsStandard(testData.users.standard);
-    await menuPage.assertLoaded();
-
-    await menuPage.openAccountsInquiry();
-    await accountsPage.assertLoaded();
-
-    await page.goBack();
-    await menuPage.assertLoaded();
-
     await menuPage.openTransactions();
-    await transactionsPage.assertLoaded();
+    await transactionsPage.openAddTransaction();
+
+    await page.getByRole('button', { name: /submit|save|add/i }).click();
+    await transactionsPage.assertValidationVisible();
   });
 });

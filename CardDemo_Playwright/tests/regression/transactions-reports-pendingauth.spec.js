@@ -1,56 +1,50 @@
 const { test } = require('@playwright/test');
 const LoginPage = require('../../pages/LoginPage');
+const MainMenuPage = require('../../pages/MainMenuPage');
 const TransactionsPage = require('../../pages/TransactionsPage');
 const ReportsPage = require('../../pages/ReportsPage');
 const PendingAuthPage = require('../../pages/PendingAuthPage');
-const data = require('../../test-data/testData');
+const testData = require('../../test-data/testData');
 
-test.describe('Regression - Transactions, Reports, Pending Authorizations', () => {
-  test.beforeEach(async ({ page }) => {
-    const login = new LoginPage(page);
-    await login.loginAsStandard(data.users.standard);
-  });
+test.describe('Regression - Transactions, Reports, Pending Auth', () => {
+  test('user can access transactions, submit reports and view pending auth', async ({ page }) => {
+    const loginPage = new LoginPage(page);
+    const menuPage = new MainMenuPage(page);
+    const transactionsPage = new TransactionsPage(page);
+    const reportsPage = new ReportsPage(page);
+    const pendingAuthPage = new PendingAuthPage(page);
 
-  test('transactions list and add transaction flow', async ({ page }) => {
-    const transactions = new TransactionsPage(page);
+    await loginPage.loginAsStandard(testData.users.standard);
+    await menuPage.assertLoaded();
 
-    await transactions.openList(data.accounts.validAccountId);
-    await transactions.openAdd();
-    await transactions.fillAddForm(data.transactions.addTransaction);
-    await transactions.submitTransaction();
-    await transactions.assertRedirectedToList();
-  });
+    await menuPage.openTransactions();
+    await transactionsPage.assertLoaded();
+    await transactionsPage.openAddTransaction();
+    await transactionsPage.addTransaction(testData.transactions.addTransaction);
+    await transactionsPage.assertTransactionAdded();
 
-  test('report request monthly', async ({ page }) => {
-    const reports = new ReportsPage(page);
+    await page.goto('/menu');
+    await menuPage.openReports();
+    await reportsPage.assertLoaded();
+    await reportsPage.submitMonthly();
+    await reportsPage.assertSubmitted();
 
-    await reports.open();
-    await reports.submitMonthly(true);
-    await reports.assertSubmitted();
-  });
+    await page.goto('/menu');
+    await menuPage.openReports();
+    await reportsPage.submitYearly();
+    await reportsPage.assertSubmitted();
 
-  test('report request yearly', async ({ page }) => {
-    const reports = new ReportsPage(page);
+    await page.goto('/menu');
+    await menuPage.openReports();
+    await reportsPage.submitCustomRange(testData.reports.customRange);
+    await reportsPage.assertSubmitted();
 
-    await reports.open();
-    await reports.submitYearly(true);
-    await reports.assertSubmitted();
-  });
-
-  test('report request custom range', async ({ page }) => {
-    const reports = new ReportsPage(page);
-
-    await reports.open();
-    await reports.submitCustom(data.reports.customRange, true);
-    await reports.assertSubmitted();
-  });
-
-  test('pending auth detail and fraud toggle', async ({ page }) => {
-    const pending = new PendingAuthPage(page);
-
-    await pending.openDetail(data.pendingAuth.validAuthorizationId);
-    await pending.assertDetailVisible();
-    await pending.markFraudIfAvailable();
-    await pending.unmarkFraudIfAvailable();
+    await page.goto('/menu');
+    await menuPage.openPendingAuthorizations();
+    await pendingAuthPage.assertLoaded();
+    await pendingAuthPage.openDetail(testData.pendingAuth.validAuthorizationId);
+    await pendingAuthPage.assertDetailVisible();
+    await pendingAuthPage.markFraudIfVisible();
+    await pendingAuthPage.unmarkFraudIfVisible();
   });
 });

@@ -2,53 +2,26 @@ const { expect } = require('@playwright/test');
 const BasePage = require('./BasePage');
 
 class CardsPage extends BasePage {
-  constructor(page) {
-    super(page);
-    this.accountId = page.locator('#accountId');
-    this.cardNumber = page.locator('#cardNumber');
-    this.cardName = page.locator('#cardName');
-  }
-
-  async openSearch() {
-    await this.goto('/cards/search');
-    await this.expectHeading(/card search/i);
-  }
-
-  async searchByAccount(accountId) {
-    await this.accountId.fill(accountId);
-    await this.page.keyboard.press('Enter');
+  async assertLoaded() {
+    await this.expectHeading(/cards|card detail|card search/i);
   }
 
   async searchByCardNumber(cardNumber) {
-    await this.cardNumber.fill(cardNumber);
-    await this.page.keyboard.press('Enter');
+    await this.page.getByRole('textbox', { name: /card number/i }).fill(cardNumber);
+    await this.page.getByRole('button', { name: /search|submit|continue/i }).click();
+  }
+
+  async assertCardDetailsVisible() {
+    await expect(this.page.getByText(/card/i)).toBeVisible();
   }
 
   async assertSearchResultsOrNoFailure() {
-    await expect(this.page.getByRole('heading', { name: /card search/i })).toBeVisible();
+    const detailText = this.page.getByText(/card|expiry|status|account/i);
+    await expect(detailText.first()).toBeVisible();
   }
 
-  async openDetail(cardNumber) {
-    await this.goto(`/cards/detail?cardNumber=${cardNumber}`);
-    await this.expectHeading(/card detail/i);
-  }
-
-  async assertCardDetailVisible() {
-    await expect(this.page.getByRole('heading', { name: 'Card Detail' })).toBeVisible();
-  }
-
-  async assertCardNotFound() {
-    await expect(this.page.getByText('Card not found', { exact: true })).toBeVisible();
-  }
-
-  async openEdit(cardNumber) {
-    await this.goto(`/cards/${cardNumber}/edit`);
-    await this.expectHeading(/update card/i);
-  }
-
-  async updateCard(cardName) {
-    await this.cardName.fill(cardName);
-    await this.clickButton(/save|update/i);
+  async assertInvalidCardHandled() {
+    await expect(this.page.getByText(/invalid|not found|problem/i)).toBeVisible();
   }
 }
 

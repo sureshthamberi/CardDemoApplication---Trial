@@ -1,16 +1,21 @@
+const { expect } = require('@playwright/test');
 const BasePage = require('./BasePage');
 
 class AdminMenuPage extends BasePage {
   async assertLoaded() {
-    await this.expectHeading(/admin menu|main menu/i);
-  }
-
-  async openUsers() {
-    await this.clickLink(/user/i);
+    await expect(this.page.getByRole('heading', { name: /menu|admin/i })).toBeVisible();
   }
 
   async openReferenceData() {
-    await this.clickLink(/transaction type|reference/i);
+    await this.page.getByRole('link', { name: /reference/i }).click();
+  }
+
+  async openUsers() {
+    await this.page.getByRole('link', { name: /users/i }).click();
+  }
+
+  async signOut() {
+    await this.signOutIfVisible();
   }
 }
 
