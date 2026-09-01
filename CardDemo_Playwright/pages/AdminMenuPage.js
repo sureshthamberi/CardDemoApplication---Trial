@@ -3,15 +3,15 @@ const BasePage = require('./BasePage');
 
 class AdminMenuPage extends BasePage {
   async assertLoaded() {
-    await expect(this.page.getByRole('heading', { name: /menu|admin/i })).toBeVisible();
+    await expect(this.page.getByRole('heading', { name: 'Admin Menu', exact: true })).toBeVisible();
   }
 
   async openReferenceData() {
-    await this.page.getByRole('link', { name: /reference/i }).click();
+    await this.page.locator('a[href="/admin/transaction-types"]').click();
   }
 
   async openUsers() {
-    await this.page.getByRole('link', { name: /users/i }).click();
+    await this.page.locator('a[href="/admin/users"]').click();
   }
 
   async signOut() {

@@ -12,6 +12,6 @@ test.describe('Accessibility - Users', () => {
     await loginPage.loginAsAdmin(testData.users.admin);
     await menuPage.openUsers();
 
-    await expectCommonAccessibility(page, /users/i);
+    await expectCommonAccessibility(page, /user administration|users/i);
   });
 });

@@ -1,4 +1,4 @@
-const { test } = require('@playwright/test');
+const { test, expect } = require('@playwright/test');
 const LoginPage = require('../../pages/LoginPage');
 const AdminMenuPage = require('../../pages/AdminMenuPage');
 const UsersPage = require('../../pages/UsersPage');
@@ -15,7 +15,7 @@ test.describe('Negative - Admin', () => {
     await menuPage.openUsers();
     await usersPage.openAdd();
 
-    await page.getByRole('button', { name: /save|submit|add/i }).click();
+    await page.getByRole('button', { name: /save|submit|add|create/i }).click();
     await usersPage.assertValidationVisible();
   });
 
@@ -28,9 +28,7 @@ test.describe('Negative - Admin', () => {
     await menuPage.openReferenceData();
     await referencePage.openAdd();
 
-    await page.getByRole('button', { name: /save|submit|add/i }).click();
-    await referencePage.assertSuccessVisible().catch(async () => {
-      await page.getByText(/required|invalid|problem/i).waitFor();
-    });
+    await page.getByRole('button', { name: /save|submit|add|create/i }).click();
+    await expect(page.locator('.govuk-error-summary, .govuk-error-message').first()).toBeVisible();
   });
 });

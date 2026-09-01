@@ -43,12 +43,13 @@ class LoginPage extends BasePage {
   }
 
   async assertValidationVisible() {
-    await expect(this.page.getByText(/required|problem|enter/i)).toBeVisible();
+    await expect(this.page.locator('.govuk-error-summary, .govuk-error-message').first()).toBeVisible();
   }
 
   async assertInvalidLoginError() {
     await expect(this.page.getByText(/invalid|incorrect|unable|problem/i)).toBeVisible();
   }
+  
 }
 
 module.exports = LoginPage;

@@ -133,6 +133,25 @@ npm run test:accessibility
 npm run test:uiux
 ```
 
+## Jira Failure Tickets
+
+The optional Jira reporter creates one Bug issue in project `DLAC` for each failed, timed-out, or interrupted test. It uses the Jira Cloud REST API and is disabled unless `JIRA_CREATE_ISSUES=true`.
+
+Set these environment variables before a run:
+
+```text
+JIRA_CREATE_ISSUES=true
+JIRA_BASE_URL=https://ibm-example-sandbox001.atlassian.net
+JIRA_PROJECT_KEY=DLAC
+JIRA_ISSUE_TYPE=Bug
+JIRA_EMAIL=your-jira-user@example.com
+JIRA_API_TOKEN=your-jira-api-token
+JIRA_ASSIGNEE_ACCOUNT_ID=REPLACE_WITH_REQUIRED_ASSIGNEE_ACCOUNT_ID
+```
+
+`JIRA_ASSIGNEE_ACCOUNT_ID` must be the required assignee's Jira Cloud account ID, not their display name. Keep the email and API token in CI secrets or an uncommitted `.env` file. The reporter never creates tickets when Jira is disabled or when the assignee remains the placeholder.
+If Jira reports that the project does not exist, verify the site URL and project key in Jira, then set `JIRA_BASE_URL` and `JIRA_PROJECT_KEY` explicitly. A project can also appear missing when the API user does not have permission to browse it.
+
 ## Recommendation
 For maximum stability and full compliance with `getByRole` locator strategy:
 - add explicit accessible labels to all fields

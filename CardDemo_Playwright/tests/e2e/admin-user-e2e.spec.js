@@ -48,6 +48,6 @@ test.describe('E2E - Admin User', () => {
     await referencePage.assertSuccessVisible();
 
     await menuPage.signOut();
-    await expect(page).toHaveURL(/auth/login/);
+    await expect(page).toHaveURL(/auth\/login/);
   });
 });

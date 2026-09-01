@@ -3,6 +3,7 @@ require('dotenv').config();
 
 module.exports = defineConfig({
   testDir: './tests',
+  //testDir: './tests/e2e/standard-user-e2e.spec.js',
   timeout: 90 * 1000,
   expect: {
     timeout: 15 * 1000
@@ -13,7 +14,8 @@ module.exports = defineConfig({
   workers: process.env.CI ? 2 : 1,
   reporter: [
     ['html', { open: 'never' }],
-    ['list']
+    ['list'],
+    ['./reporters/jira-failure-reporter.js']
   ],
   use: {
     baseURL: process.env.BASE_URL || 'http://localhost:3000',

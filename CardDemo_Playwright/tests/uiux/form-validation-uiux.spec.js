@@ -5,6 +5,6 @@ test.describe('UI/UX - Form Validation', () => {
     await page.goto('/auth/login');
     await page.getByRole('button', { name: /sign in|login/i }).click();
 
-    await expect(page.getByText(/required|problem|enter/i)).toBeVisible();
+    await expect(page.locator('.govuk-error-summary, .govuk-error-message').first()).toBeVisible();
   });
 });

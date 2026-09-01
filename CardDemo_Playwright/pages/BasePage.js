@@ -26,8 +26,22 @@ class BasePage {
   }
 
   async selectOption(labelPattern, value) {
-    await this.page.getByRole('combobox', { name: labelPattern }).selectOption({ label: value }).catch(async () => {
-      await this.page.getByRole('combobox', { name: labelPattern }).selectOption(value);
+    const select = this.page.getByRole('combobox', { name: labelPattern });
+    const optionValue = String(value);
+
+    await select.selectOption({ label: optionValue }).catch(async () => {
+      await select.selectOption({ value: optionValue }).catch(async () => {
+        const option = select.locator('option').filter({
+          hasText: new RegExp(optionValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i')
+        }).first();
+
+        if (await option.count()) {
+          await select.selectOption({ label: (await option.textContent()).trim() });
+          return;
+        }
+
+        throw new Error(`No option matched "${value}" for ${labelPattern}`);
+      });
     });
   }
 

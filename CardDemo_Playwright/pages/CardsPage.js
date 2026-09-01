@@ -21,7 +21,7 @@ class CardsPage extends BasePage {
   }
 
   async assertInvalidCardHandled() {
-    await expect(this.page.getByText(/invalid|not found|problem/i)).toBeVisible();
+    await expect(this.page.getByText('No cards found for the given search criteria.', { exact: true })).toBeVisible();
   }
 }
 

@@ -12,6 +12,6 @@ test.describe('Accessibility - Reference', () => {
     await loginPage.loginAsAdmin(testData.users.admin);
     await menuPage.openReferenceData();
 
-    await expectCommonAccessibility(page, /reference/i);
+    await expectCommonAccessibility(page, /transaction type|reference/i);
   });
 });

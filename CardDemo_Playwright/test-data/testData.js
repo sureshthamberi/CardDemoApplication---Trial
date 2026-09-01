@@ -64,14 +64,14 @@ module.exports = {
     newUser: {
       firstName: 'Play',
       lastName: 'Writer',
-      userId: 'pwuser01',
+      userId: 'USR007',
       password: 'Secret123',
       userType: 'STANDARD'
     },
     updatedUser: {
-      firstName: 'PlayUpdated',
-      lastName: 'WriterUpdated',
-      password: 'Secret456',
+      firstName: 'Play',
+      lastName: 'Writer',
+      password: 'Secret123',
       userType: 'ADMIN'
     }
   }

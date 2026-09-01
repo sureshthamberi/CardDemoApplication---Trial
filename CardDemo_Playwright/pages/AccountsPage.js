@@ -7,29 +7,29 @@ class AccountsPage extends BasePage {
   }
 
   async searchAccount(accountId) {
+    this.accountId = accountId;
     await this.page.getByRole('textbox', { name: /account id|account number/i }).fill(accountId);
-    await this.page.getByRole('button', { name: /search|submit|continue/i }).click();
+    await this.page.getByRole('button', { name: /enquire|search|submit|continue/i }).click();
   }
 
   async assertAccountDetailsVisible() {
-    await expect(this.page.getByText(/account/i)).toBeVisible();
+    await expect(this.page.getByText('Account Details', { exact: true })).toBeVisible();
   }
 
   async assertInvalidSearchHandled() {
-    await expect(this.page.getByText(/not found|invalid|unable|problem/i)).toBeVisible();
+    await expect(this.page.locator('.govuk-error-summary, .govuk-error-message').first()).toBeVisible();
   }
 
   async navigateToPayBill() {
-    const payBillLink = this.page.getByRole('link', { name: /pay bill|bill payment|make payment/i });
-    const payBillButton = this.page.getByRole('button', { name: /pay bill|bill payment|make payment/i });
+    await this.page.goto('/payments/bill');
 
-    if (await payBillLink.count()) {
-      await payBillLink.first().click();
-      return;
-    }
-
-    if (await payBillButton.count()) {
-      await payBillButton.first().click();
+    const accountInput = this.page.getByRole('textbox', { name: /account id|account number/i });
+    if (await accountInput.count() && this.accountId) {
+      await accountInput.fill(this.accountId);
+      await Promise.all([
+        this.page.waitForLoadState('domcontentloaded'),
+        this.page.locator('form[action="/payments/bill/preview"]').evaluate(form => form.submit())
+      ]);
     }
   }
 }

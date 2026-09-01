@@ -53,6 +53,6 @@ test.describe('E2E - Standard User', () => {
     await pendingAuthPage.assertDetailVisible();
 
     await menuPage.signOut();
-    await expect(page).toHaveURL(/auth/login/);
+    await expect(page).toHaveURL(/auth\/login/);
   });
 });

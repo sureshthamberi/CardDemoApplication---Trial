@@ -11,6 +11,7 @@ class ReportsPage extends BasePage {
     if (await monthlyRadio.count()) {
       await monthlyRadio.check();
     }
+    await this.page.getByRole('radio', { name: /yes, submit this report/i }).check();
     await this.page.getByRole('button', { name: /submit|continue|request/i }).click();
   }
 
@@ -19,6 +20,7 @@ class ReportsPage extends BasePage {
     if (await yearlyRadio.count()) {
       await yearlyRadio.check();
     }
+    await this.page.getByRole('radio', { name: /yes, submit this report/i }).check();
     await this.page.getByRole('button', { name: /submit|continue|request/i }).click();
   }
 
@@ -40,15 +42,16 @@ class ReportsPage extends BasePage {
       await textboxes.nth(5).fill(range.endDate.year);
     }
 
+    await this.page.getByRole('radio', { name: /yes, submit this report/i }).check();
     await this.page.getByRole('button', { name: /submit|continue|request/i }).click();
   }
 
   async assertSubmitted() {
-    await expect(this.page.getByText(/submitted|requested|success/i)).toBeVisible();
+    await expect(this.page.locator('main')).toContainText(/submitted|requested|success|report generated/i);
   }
 
   async assertValidationVisible() {
-    await expect(this.page.getByText(/required|select|enter|problem/i)).toBeVisible();
+    await expect(this.page.locator('.govuk-error-summary, .govuk-error-message').first()).toBeVisible();
   }
 }
 

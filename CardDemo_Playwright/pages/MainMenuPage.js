@@ -7,27 +7,27 @@ class MainMenuPage extends BasePage {
   }
 
   async openAccountsInquiry() {
-    await this.page.getByRole('link', { name: /accounts|account inquiry/i }).click();
+    await this.page.getByRole('link', { name: /account inquiry/i }).click();
   }
 
   async openCards() {
-    await this.page.getByRole('link', { name: /cards|card/i }).click();
+    await this.page.locator('a[href="/cards/search"]').click();
   }
 
   async openPayments() {
-    await this.page.getByRole('link', { name: /payments|bill payment/i }).click();
+    await this.page.locator('a[href="/payments/bill"]').click();
   }
 
   async openPendingAuthorizations() {
-    await this.page.getByRole('link', { name: /pending auth|pending authorizations/i }).click();
+    await this.page.locator('a[href="/pending-authorizations"]').click();
   }
 
   async openReports() {
-    await this.page.getByRole('link', { name: /reports|report request/i }).click();
+    await this.page.locator('a[href="/reports/requests"]').click();
   }
 
   async openTransactions() {
-    await this.page.getByRole('link', { name: /transactions/i }).click();
+    await this.page.locator('a[href="/transactions"]').click();
   }
 
   async signOut() {

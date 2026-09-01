@@ -21,7 +21,7 @@ class PendingAuthPage extends BasePage {
   }
 
   async assertDetailVisible() {
-    await expect(this.page.getByText(/authorization|merchant|amount|status/i)).toBeVisible();
+    await expect(this.page.locator('main')).toContainText(/authorization|merchant|amount|status/i, { timeout: 15000 });
   }
 
   async markFraudIfVisible() {

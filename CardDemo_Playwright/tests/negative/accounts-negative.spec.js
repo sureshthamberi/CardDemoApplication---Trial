@@ -13,7 +13,7 @@ test.describe('Negative - Accounts', () => {
     await loginPage.loginAsStandard(testData.users.standard);
     await menuPage.openAccountsInquiry();
 
-    await page.getByRole('button', { name: /search|submit|continue/i }).click();
+    await page.getByRole('button', { name: /enquire|search|submit|continue/i }).click();
     await accountsPage.assertInvalidSearchHandled();
 
     await accountsPage.searchAccount(testData.accounts.invalidAccountId);

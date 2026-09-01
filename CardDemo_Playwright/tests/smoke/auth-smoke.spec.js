@@ -12,7 +12,7 @@ test.describe('Smoke - Auth', () => {
     await menuPage.assertLoaded();
 
     await menuPage.signOut();
-    await expect(page).toHaveURL(/auth/login/);
+    await expect(page).toHaveURL(/auth\/login/);
   });
 
   test('admin user can sign in', async ({ page }) => {

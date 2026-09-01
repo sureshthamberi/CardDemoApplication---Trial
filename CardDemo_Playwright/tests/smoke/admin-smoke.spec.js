@@ -18,7 +18,7 @@ test.describe('Smoke - Admin User', () => {
     await menuPage.openReferenceData();
     await referencePage.assertLoaded();
 
-    await page.goBack();
+    await page.goto('/menu/admin');
 
     await menuPage.openUsers();
     await usersPage.assertLoaded();
